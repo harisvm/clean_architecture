@@ -19,7 +19,14 @@ void main() {
   final tNumber = 1;
   final tNumberTrivia = NumberTrivia(text: 'test',number: 1);
   test('Should get concrete number trivia', () async{
-
+//arrange
     when(mockNumberTriviaRepository.getConcreteNumberTrivia(any)).thenAnswer((realInvocation) async => Right(tNumberTrivia));
+    //act
+    final result  = await useCase.execute(number:tNumber);
+
+    //assert
+    expect(result, Right(tNumberTrivia));
+    verify(mockNumberTriviaRepository.getConcreteNumberTrivia(tNumber));
+    verifyNoMoreInteractions(mockNumberTriviaRepository);
   });
 }
