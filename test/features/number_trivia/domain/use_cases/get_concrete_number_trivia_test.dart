@@ -22,7 +22,7 @@ void main() {
 //arrange
     when(mockNumberTriviaRepository.getConcreteNumberTrivia(any)).thenAnswer((realInvocation) async => Right(tNumberTrivia));
     //act
-    final result  = await useCase.execute(number:tNumber);
+    final result  = await useCase.call(tNumber);
 
     //assert
     expect(result, Right(tNumberTrivia));
