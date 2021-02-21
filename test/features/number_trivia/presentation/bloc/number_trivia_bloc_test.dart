@@ -1,4 +1,5 @@
 import 'package:clean_architecture_tdd/core/error/failure.dart';
+import 'package:clean_architecture_tdd/core/use_cases/use_case.dart';
 import 'package:clean_architecture_tdd/core/util/input_converter.dart';
 import 'package:clean_architecture_tdd/features/number_trivia/domain/entities/number_trivia.dart';
 import 'package:clean_architecture_tdd/features/number_trivia/domain/use_cases/get_concrete_number_trivia.dart';
@@ -123,6 +124,72 @@ void main() {
       expectLater(bloc.state, emitsInOrder(expected));
 
       bloc.dispatch(GetTriviaForConcreteNumber(tNumberString));
+    });
+  });
+
+  group('GetTriviaForRandomNumber', () {
+
+
+    final tNumberTrivia = NumberTrivia(number: 1, text: 'test trivia');
+
+
+
+
+
+
+
+    test(' Should get data from the random use case', () async {
+
+      when(mockRandomNumberTrivia(NoParams()))
+          .thenAnswer((_) async => Right(tNumberTrivia));
+
+      bloc.dispatch(GetTriviaForRandomNumber());
+      await untilCalled(mockRandomNumberTrivia(any));
+
+      verify(mockRandomNumberTrivia(NoParams()));
+    });
+
+    test(' Should emit [Loading, Loaded] when data is returned successfully',
+        () async {
+
+      when(mockRandomNumberTrivia(any))
+          .thenAnswer((_) async => Right(tNumberTrivia));
+
+      final expected = [Empty(), Loading(), Loaded(trivia: tNumberTrivia)];
+      expectLater(bloc.state, emitsInOrder(expected));
+
+      bloc.dispatch(GetTriviaForRandomNumber());
+    });
+
+    test('Should emit [Loading, Error] when getting data fails', () async {
+
+      when(mockRandomNumberTrivia(any))
+          .thenAnswer((_) async => Left(ServerFailures()));
+
+      final expected = [
+        Empty(),
+        Loading(),
+        Error(message: SERVER_FAILURE_MESSAGE)
+      ];
+      expectLater(bloc.state, emitsInOrder(expected));
+
+      bloc.dispatch(GetTriviaForRandomNumber());
+    });
+    test(
+        'Should emit [Loading, Error] with proper message for the error when getting data fails',
+        () async {
+
+      when(mockRandomNumberTrivia(any))
+          .thenAnswer((_) async => Left(CacheFailures()));
+
+      final expected = [
+        Empty(),
+        Loading(),
+        Error(message: CACHE_FAILURE_MESSAGE)
+      ];
+      expectLater(bloc.state, emitsInOrder(expected));
+
+      bloc.dispatch(GetTriviaForRandomNumber());
     });
   });
 }
